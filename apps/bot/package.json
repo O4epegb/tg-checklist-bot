@@ -5,6 +5,7 @@
     "prepare-disabled": "husky install",
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register ./src/index.ts",
     "start": "NODE_ENV=production ts-node -r tsconfig-paths/register ./src/index.ts",
+    "build": "NODE_ENV=production ts-node -r tsconfig-paths/register ./index.ts",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "lint": "eslint . --ext ts,tsx,js",
