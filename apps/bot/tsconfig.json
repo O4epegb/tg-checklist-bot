@@ -10,9 +10,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "noUnusedLocals": false,
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "noUnusedLocals": false
+    // "paths": {
+    //   "~/*": ["./src/*"]
+    // }
   }
 }
