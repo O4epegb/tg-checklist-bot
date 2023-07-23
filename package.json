@@ -1,0 +1,20 @@
+{
+  "name": "checklistbot",
+  "private": true,
+  "packageManager": "yarn@3.6.0",
+  "workspaces": [
+    "apps/bot"
+  ],
+  "scripts": {
+    "prepare1": "husky install",
+    "test": "jest",
+    "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register ./src/index.ts",
+    "start": "yarn prisma prod migrate deploy && yarn prisma prod db seed && NODE_ENV=production ts-node -r tsconfig-paths/register ./src/index.ts",
+    "build": "yarn prisma prod generate",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext ts,tsx,js",
+    "test-all": "yarn lint && yarn type-check",
+    "prisma": "node ./scripts/prisma.js"
+  }
+}

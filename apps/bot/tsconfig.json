@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "target": "ES2020",
+    "module": "commonjs",
+    // also add "type": "module", to package
+    // Use node --loader ts-node/esm ./src/log-loader.ts
+    // "module": "ES2020",
+    // "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noUnusedLocals": false,
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}
