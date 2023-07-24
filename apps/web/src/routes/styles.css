@@ -1,0 +1,100 @@
+:root {
+  --font-body: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+
+  --tg-theme-bg-color: #1d2733;
+  --tg-theme-secondary-bg-color: #151e27;
+  --tg-theme-text-color: #ffffff;
+  --tg-theme-hint-color: #7d8b99;
+  --tg-theme-link-color: #5eabe1;
+  --tg-theme-button-color: #50a8eb;
+  --tg-theme-button-text-color: #ffffff;
+
+  --radius: 0.5rem;
+
+  color-scheme: var(--tg-color-scheme, dark);
+  font-family: var(--font-body);
+  color: var(--tg-theme-text-color);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--tg-theme-secondary-bg-color);
+}
+
+h1,
+h2,
+p {
+  font-weight: 400;
+}
+
+p {
+  line-height: 1.5;
+}
+
+a {
+  color: var(--tg-theme-link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 2rem;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+.text-column {
+  display: flex;
+  max-width: 48rem;
+  flex: 0.6;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.2s ease-in-out;
+  color: var(--tg-theme-button-text-color);
+  background-color: transparent;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.button {
+  background-color: var(--tg-theme-button-color);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+input,
+button {
+  font-size: inherit;
+  font-family: inherit;
+}
+
+@media (min-width: 720px) {
+  h1 {
+    font-size: 2.4rem;
+  }
+}
