@@ -4,6 +4,10 @@ dotenv.config({
   path: `.env.local`,
 })
 
-const bot = await import('./bot').then((m) => m.bot)
+const main = async () => {
+  const bot = await import('./bot').then((m) => m.bot)
 
-bot.start()
+  bot.start()
+}
+
+main()
