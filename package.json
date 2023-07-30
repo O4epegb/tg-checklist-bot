@@ -1,8 +1,16 @@
 {
   "name": "checklistbot",
   "private": true,
-  "packageManager": "yarn@3.6.0",
+  "packageManager": "yarn@3.6.1",
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "prettier": "^3.0.0",
+    "prettier-plugin-svelte": "^3.0.3"
+  }
 }

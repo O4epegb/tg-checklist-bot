@@ -16,7 +16,7 @@
     isChecked: false,
   }))
 
-  let counter: number = 0
+  let counter = 0
 
   const stack = createStack(list)
 
