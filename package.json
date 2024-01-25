@@ -10,7 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "prettier": "^3.0.0",
-    "prettier-plugin-svelte": "^3.0.3"
+    "prettier": "^3.2.4",
+    "prettier-plugin-svelte": "^3.1.2"
   }
 }
