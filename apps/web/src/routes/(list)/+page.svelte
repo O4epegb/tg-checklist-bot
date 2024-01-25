@@ -102,7 +102,7 @@
 
   <div class="list">
     {#each $state.items as item, index (item.id)}
-      <div class="item" transition:scale animate:flip={{ duration: 150 }}>
+      <div class="item" transition:scale animate:flip={{ duration: 250 }}>
         <button
           type="button"
           class="item-button"
@@ -322,13 +322,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* align-items: center; */
     flex: 0.6;
     gap: 1rem;
   }
 
   h1 {
-    width: 100%;
+    margin-top: 0;
   }
 
   .sticky {
@@ -347,13 +346,16 @@
 
   .item {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
   }
 
   .item-button {
-    padding: 0.5rem 0.25rem;
-    margin-left: -0.25rem;
+    padding: 0.3rem;
     flex-shrink: 0;
+    line-height: 1;
+    background-color: rgb(from var(--tg-theme-button-color) r g b / 0.2);
+    border-radius: calc(var(--radius) - 2px);
   }
 
   .checkbox {
@@ -384,6 +386,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.5rem 0;
   }
 
   .item-name {
