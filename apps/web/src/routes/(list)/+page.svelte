@@ -1,36 +1,84 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { flip } from 'svelte/animate'
-  import { scale } from 'svelte/transition'
+  import { fly, scale } from 'svelte/transition'
+  import { createStack } from '$lib/createStack'
+  import { createHash } from '$lib/utils'
+  import { writable } from 'svelte/store'
+  import Modal from './Modal.svelte'
+  import Dev from './Dev.svelte'
   // import welcome from '$lib/images/svelte-welcome.webp';
   // import welcome_fallback from '$lib/images/svelte-welcome.png';
-  import type { PageData } from './$types'
   // import { WebApp } from '@grammyjs/web-app'
-  import { browser } from '$app/environment'
-  import { createStack } from '$lib/createStack'
 
-  export let data: PageData
-
-  let list: { text: string; isChecked: boolean }[] = data.list.map((item) => ({
-    text: item,
-    isChecked: false,
-  }))
+  type Item = {
+    id: string
+    text: string
+    isChecked: boolean
+  }
+  type Items = Item[]
+  type List = {
+    id: string
+    name: string
+    items: Items
+  }
 
   let counter = 0
+  let isMenuOpen = false
 
-  const stack = createStack(list)
+  let itemToEdit: null | Item = null
+
+  const state = writable<List>({
+    id: '',
+    name: 'Untitled list',
+    items: [],
+  })
+  let stack = createStack($state.items)
 
   onMount(() => {
-    const x = Number(localStorage.getItem('test') ?? '0')
-    counter = x
+    const counterFromStorage = Number(localStorage.getItem('test') ?? '0')
+    counter = counterFromStorage
+    localStorage.setItem('test', String(counterFromStorage + 1))
 
-    localStorage.setItem('test', String(x + 1))
-    ;(window as any).createTestList = () => {
-      window.location.search = `q=${encodeURIComponent(
-        Array.from({ length: 10 }, (_, i) => `item ${i}`).join('\n'),
-      )}`
+    const queryList = new URLSearchParams(window.location.search).get('q')
+
+    if (!queryList) {
+      return
     }
+
+    const listId = createHash(queryList ?? '')
+    const storageKey = `list-${listId}`
+    const listFromStorage: List | null = JSON.parse(localStorage.getItem(storageKey) ?? 'null')
+    const numberOfLists = Object.keys(localStorage).filter((key) => key.startsWith('list-')).length
+
+    if (listFromStorage) {
+      state.set(listFromStorage)
+      stack = createStack(listFromStorage.items)
+    } else {
+      const rawItemTexts = (queryList ?? '')
+        .split('\n')
+        .map((item) => item.trim().replace(/^[-◦*●▪•+▸▹]+/, ''))
+        .filter(Boolean)
+
+      $state.name = `List #${numberOfLists + 1}`
+      $state.id = listId
+      $state.items = rawItemTexts.map((text, index) => ({
+        id: String(index),
+        text,
+        isChecked: false,
+      }))
+      stack = createStack($state.items)
+    }
+
+    state.subscribe((data) => {
+      console.log('data', data)
+      localStorage.setItem(storageKey, JSON.stringify(data))
+    })
   })
+
+  const editItemText = (text: string, id: string) => {
+    $state.items = stack.push($state.items.map((x) => (x.id !== id ? x : { ...x, text })))
+  }
 </script>
 
 <svelte:head>
@@ -38,24 +86,29 @@
   <meta name="description" content="List page" />
 </svelte:head>
 
+<h1>checklistbot</h1>
+
+<Dev
+  on:click={() => {
+    $state.items = stack.push([
+      { id: `${Math.random()}`, text: `New item ${Math.random()}`, isChecked: false },
+      ...$state.items,
+    ])
+  }}
+/>
+
 <section>
-  <h1>Hello there {counter}</h1>
+  <input placeholder="Untitled list..." type="text" class="name" bind:value={$state.name} />
 
-  {#if browser}
-    <div>
-      <!-- {window.Telegram.WebApp.initData} -->
-    </div>
-  {/if}
-
-  <div>
-    {#each list as item, index (item.text)}
+  <div class="list">
+    {#each $state.items as item, index (item.id)}
       <div class="item" transition:scale animate:flip={{ duration: 150 }}>
         <button
           type="button"
-          class="delete"
+          class="item-button"
           on:click={(e) => {
             e.stopPropagation()
-            list = stack.push(list.filter((x) => x !== item))
+            $state.items = stack.push($state.items.filter((x) => x !== item))
           }}
         >
           <svg
@@ -72,32 +125,144 @@
             />
           </svg>
         </button>
-        <label class="text" for={`checkbox-${index}`}>
-          {item.text}
-        </label>
-        <input
-          id={`checkbox-${index}`}
-          class="checkbox"
-          type="checkbox"
-          checked={item.isChecked}
-          on:change={(e) => {
-            list = stack.push(
-              list
-                .map((x) => (x !== item ? x : { ...x, isChecked: e.currentTarget.checked }))
-                .sort((a, b) => (a.isChecked === b.isChecked ? 0 : a.isChecked ? 1 : -1)),
-            )
+        <button
+          type="button"
+          class="item-button"
+          on:click={() => {
+            itemToEdit = { ...item }
           }}
-        />
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            width="16"
+            height="16"
+          >
+            <path
+              d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"
+            />
+            <path
+              d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"
+            />
+          </svg>
+        </button>
+        <label class="text" for={`checkbox-${index}`}>
+          <span class="item-name">
+            {item.text}
+          </span>
+          <input
+            id={`checkbox-${index}`}
+            class="checkbox"
+            type="checkbox"
+            checked={item.isChecked}
+            on:change={(e) => {
+              $state.items = stack.push(
+                $state.items
+                  .map((x) => (x !== item ? x : { ...x, isChecked: e.currentTarget.checked }))
+                  .sort((a, b) => (a.isChecked === b.isChecked ? 0 : a.isChecked ? 1 : -1)),
+              )
+            }}
+          />
+        </label>
       </div>
     {/each}
   </div>
 
+  <Modal show={Boolean(itemToEdit)} on:close={() => (itemToEdit = null)}>
+    {#if itemToEdit}
+      <!-- svelte-ignore a11y-autofocus -->
+
+      <div class="item-modal">
+        <textarea
+          autofocus
+          rows="3"
+          class="name-input"
+          value={itemToEdit.text}
+          on:input={(e) => {
+            if (itemToEdit) {
+              itemToEdit.text = e.currentTarget.value
+            }
+          }}
+          on:keydown={(e) => {
+            if (e.key === 'Enter' && itemToEdit) {
+              editItemText(itemToEdit.text, itemToEdit.id)
+              itemToEdit = null
+            }
+            if (e.key === 'Escape') {
+              itemToEdit = null
+            }
+          }}
+        />
+
+        <button
+          type="button"
+          class="button"
+          on:click={() => {
+            if (itemToEdit) {
+              editItemText(itemToEdit.text, itemToEdit.id)
+              itemToEdit = null
+            }
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={20}
+            height={20}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    {/if}
+  </Modal>
+
+  {#if isMenuOpen}
+    <nav
+      transition:fly={{
+        duration: 200,
+        x: -250,
+      }}
+    >
+      Menu
+      <div>WIP</div>
+    </nav>
+  {/if}
+
   <div class="sticky">
+    <button
+      type="button"
+      class="button menu"
+      on:click={() => {
+        isMenuOpen = !isMenuOpen
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        width="20"
+        height="20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </button>
+
     <button
       type="button"
       class="button"
       on:click={() => {
-        list = stack.push(list.concat({ text: `New item ${Math.random()}`, isChecked: false }))
+        //
       }}
     >
       <svg
@@ -114,15 +279,15 @@
         />
       </svg>
     </button>
-    {#each [1, false && !$stack.last && 2].filter(Boolean) as item (item)}
+    {#each ['undo', false && !$stack.last && 'redo'].filter(Boolean) as item (item)}
       <button
         transition:scale
         animate:flip={{ duration: 150 }}
         type="button"
         class="button"
-        disabled={item === 1 ? $stack.first : $stack.last}
+        disabled={item === 'undo' ? $stack.first : $stack.last}
         on:click={() => {
-          list = item === 1 ? stack.undo() : stack.redo()
+          $state.items = item === 'undo' ? stack.undo() : stack.redo()
         }}
       >
         <svg
@@ -132,14 +297,14 @@
           height="20"
           fill="currentColor"
         >
-          {#if item === 1}
+          {#if item === 'undo'}
             <path
               fill-rule="evenodd"
               d="M7.793 2.232a.75.75 0 01-.025 1.06L3.622 7.25h10.003a5.375 5.375 0 010 10.75H10.75a.75.75 0 010-1.5h2.875a3.875 3.875 0 000-7.75H3.622l4.146 3.957a.75.75 0 01-1.036 1.085l-5.5-5.25a.75.75 0 010-1.085l5.5-5.25a.75.75 0 011.06.025z"
               clip-rule="evenodd"
             />
           {/if}
-          {#if item === 2}
+          {#if item === 'redo'}
             <path
               fill-rule="evenodd"
               d="M12.207 2.232a.75.75 0 00.025 1.06l4.146 3.958H6.375a5.375 5.375 0 000 10.75H9.25a.75.75 0 000-1.5H6.375a3.875 3.875 0 010-7.75h10.003l-4.146 3.957a.75.75 0 001.036 1.085l5.5-5.25a.75.75 0 000-1.085l-5.5-5.25a.75.75 0 00-1.06.025z"
@@ -159,6 +324,7 @@
     justify-content: center;
     /* align-items: center; */
     flex: 0.6;
+    gap: 1rem;
   }
 
   h1 {
@@ -175,27 +341,86 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem;
+    background-color: var(--light-background-color);
+    border-top: 1px solid rgb(from var(--tg-theme-text-color) r g b / 30%);
   }
 
   .item {
     display: flex;
-    align-items: center;
     gap: 0.5rem;
-    /* &:not(:last-child) {
-      border-bottom: 1px solid currentColor;
-    } */
   }
 
-  .delete {
+  .item-button {
     padding: 0.5rem 0.25rem;
     margin-left: -0.25rem;
+    flex-shrink: 0;
   }
 
   .checkbox {
     margin-left: auto;
+    flex-shrink: 0;
   }
 
   .text {
     flex: 1;
+  }
+
+  .list {
+    padding-bottom: 3rem;
+  }
+
+  .name {
+    font-size: 1.5rem;
+    font-weight: 500;
+    padding: 0.5rem;
+    border: 0;
+    border-bottom: 1px solid rgb(from var(--tg-theme-text-color) r g b / 30%);
+    background-color: transparent;
+    color: var(--tg-theme-text-color);
+    outline: none;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .item-name {
+    flex: 1;
+  }
+
+  nav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: var(--light-background-color);
+  }
+
+  .item-modal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .name-input {
+    flex: 1;
+    font-size: 1.5rem;
+    font-weight: 500;
+    padding: 0.5rem;
+    border: 0;
+    border-bottom: 1px solid rgb(from var(--tg-theme-text-color) r g b / 30%);
+    background-color: transparent;
+    color: var(--tg-theme-text-color);
+    outline: none;
+    min-width: 0;
+    resize: none;
   }
 </style>
