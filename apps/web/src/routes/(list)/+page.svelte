@@ -147,7 +147,7 @@
             />
           </svg>
         </button>
-        <label class="text" for={`checkbox-${index}`}>
+        <label for={`checkbox-${index}`}>
           <span class="item-name">
             {item.text}
           </span>
@@ -363,9 +363,6 @@
     flex-shrink: 0;
   }
 
-  .text {
-    flex: 1;
-  }
 
   .list {
     padding-bottom: 3rem;
@@ -386,11 +383,13 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0;
+    flex: 1;
+    padding: 0.6rem 0;
   }
 
   .item-name {
     flex: 1;
+    font-size: 1.1rem
   }
 
   nav {

@@ -10,7 +10,7 @@
   --tg-theme-button-color: #50a8eb;
   --tg-theme-button-text-color: #ffffff;
 
-  --light-background-color: oklch(from var(--tg-theme-secondary-bg-color) calc(l + 10) c h);
+  --light-background-color: oklch(from var(--tg-theme-secondary-bg-color) calc(l * 1.25) c h);
 
   --radius: 0.5rem;
 
@@ -54,10 +54,6 @@ a:hover {
 h1 {
   font-size: 2rem;
   text-align: center;
-}
-
-h2 {
-  font-size: 1rem;
 }
 
 button {
