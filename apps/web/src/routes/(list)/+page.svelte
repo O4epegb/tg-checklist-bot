@@ -9,7 +9,6 @@
   import Dev from './Dev.svelte'
   // import welcome from '$lib/images/svelte-welcome.webp';
   // import welcome_fallback from '$lib/images/svelte-welcome.png';
-  // import { WebApp } from '@grammyjs/web-app'
 
   type Item = {
     id: string
@@ -23,7 +22,6 @@
     items: Items
   }
 
-  let counter = 0
   let isMenuOpen = false
 
   let itemToEdit: null | Item = null
@@ -36,10 +34,6 @@
   let stack = createStack($state.items)
 
   onMount(() => {
-    const counterFromStorage = Number(localStorage.getItem('test') ?? '0')
-    counter = counterFromStorage
-    localStorage.setItem('test', String(counterFromStorage + 1))
-
     const queryList = new URLSearchParams(window.location.search).get('q')
 
     if (!queryList) {
@@ -279,7 +273,8 @@
         />
       </svg>
     </button>
-    {#each ['undo', false && !$stack.last && 'redo'].filter(Boolean) as item (item)}
+    {#each ['undo'].filter(Boolean) as item (item)}
+      <!-- !$stack.last && 'redo' -->
       <button
         transition:scale
         animate:flip={{ duration: 150 }}
@@ -363,7 +358,6 @@
     flex-shrink: 0;
   }
 
-
   .list {
     padding-bottom: 3rem;
   }
@@ -389,7 +383,8 @@
 
   .item-name {
     flex: 1;
-    font-size: 1.1rem
+    font-size: 1.1rem;
+    word-break: break-word;
   }
 
   nav {

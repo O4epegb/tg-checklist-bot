@@ -7,20 +7,22 @@
     "start": "NODE_ENV=production tsx ./src/index.ts",
     "vercel-build": "NODE_ENV=production tsx ./index.ts",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --ext ts,tsx,js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
     "test-all": "yarn lint && yarn type-check"
   },
   "dependencies": {
-    "grammy": "^1.20.3",
-    "tsx": "^3.14.0"
+    "grammy": "^1.29.0",
+    "tsx": "^4.19.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.6",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
-    "dotenv": "^16.4.1",
-    "eslint": "^8.56.0",
-    "eslint-plugin-svelte": "^2.35.1",
-    "typescript": "^5.3.3"
+    "@eslint/js": "^9.9.1",
+    "@types/node": "^22.5.1",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.3.0"
   }
 }

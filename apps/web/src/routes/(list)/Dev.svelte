@@ -8,7 +8,7 @@
       class="dev-button"
       on:click={() => {
         window.location.search = `q=${encodeURIComponent(
-          Array.from({ length: 10 }, (_, i) => `item ${Math.random()}`).join('\n'),
+          Array.from({ length: 10 }, () => `item ${Math.random()}`).join('\n'),
         )}`
       }}
     >

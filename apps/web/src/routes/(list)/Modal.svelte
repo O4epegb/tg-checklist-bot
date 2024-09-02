@@ -16,7 +16,6 @@
     class="overlay"
     transition:fade={{ duration: 150 }}
     on:click={(e) => {
-      console.log(e.target)
       if (e.target instanceof HTMLDivElement && 'close' in e.target.dataset) {
         show = false
         dispatch('close')

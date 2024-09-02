@@ -6,7 +6,7 @@ const webHookUrl = process.env['WEBHOOK']
 if (token && webHookUrl) {
   const bot = new Bot(token)
 
-  bot.api.setWebhook(webHookUrl)
+  void bot.api.setWebhook(webHookUrl)
 } else {
   throw new Error('Missing token or webhook url')
 }

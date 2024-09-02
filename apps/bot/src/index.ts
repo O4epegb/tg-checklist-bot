@@ -7,7 +7,7 @@ dotenv.config({
 const main = async () => {
   const bot = await import('./bot').then((m) => m.bot)
 
-  bot.start()
+  return bot.start()
 }
 
-main()
+void main()
